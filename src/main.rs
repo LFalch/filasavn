@@ -49,7 +49,7 @@ fn main() -> Result<(), String> {
         Command::List => {
             let mut max_length_width = 0;
             for FileSpec{contents, ..} in &savn {
-                let length_width = contents.len().ilog10() as usize + 1;
+                let length_width = contents.len().max(1).ilog10() as usize + 1;
                 max_length_width = max_length_width.max(length_width);
             }
             for spec in &savn {

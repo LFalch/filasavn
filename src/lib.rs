@@ -87,7 +87,14 @@ pub fn add_file(savn: &mut Savn, file: impl AsRef<Path>) -> io::Result<()> {
     let mut file_type = FileType::default();
     let contents = if metadata.is_symlink() {
         file_type = FileType::SoftSymlink;
-        fs::read_link(path)?.to_str().unwrap().as_bytes().to_vec().into_boxed_slice()
+        path.read_link()?.to_str().unwrap().as_bytes().to_vec().into_boxed_slice()
+    } else if metadata.is_dir() {
+        for entry in path.read_dir()? {
+            let entry = entry?;
+            add_file(savn, entry.path())?;
+        }
+        // if it's a directory, we do nothing
+        return Ok(());
     } else {
         fs::read(path)?.into_boxed_slice()
     };
